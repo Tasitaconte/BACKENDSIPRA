@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\SIPRA_FESC.props" />
+</Project>
