@@ -1,4 +1,5 @@
-﻿using SIPRA_FESC.Entities;
+﻿
+using SIPRA_FESC.Entities;
 using System.Text.Json.Serialization;
 
 namespace SIPRA_FESC.Dtos

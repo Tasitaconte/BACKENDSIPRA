@@ -22,6 +22,12 @@ public class UsuarioController : ControllerBase
     {
         return _services.GetAll();
     }
+    
+    [HttpGet("/{idRol}")]
+    public Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarioByRol(int idRol)
+    {
+        return _services.GetUsuarioByRol(idRol);
+    }
 
     [HttpPost("/crear/extension")]
     public IActionResult PostUsuarioExtension([FromBody] UsuarioRequestCrearModel usuario)

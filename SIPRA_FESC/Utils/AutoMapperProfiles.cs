@@ -26,6 +26,10 @@ namespace SIPRA_FESC.Utils
             CreateMap<Usuario, UsuarioRequestCrearModel>();
             
             CreateMap<UsuarioDto, UsuarioRequestCrearModel>();
+
+            CreateMap<FormulariosCargado, FormularioCargadoDto>();
+
+            CreateMap<FormularioCargadoDto, FormulariosCargado>();
         }
     }
 }

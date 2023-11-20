@@ -1,14 +1,47 @@
-﻿namespace SIPRA_FESC.Data.Models
+﻿using System.Security.Claims;
+
+namespace SIPRA_FESC.Data.Models;
+
+public class Jwt
 {
-    public class Jwt
+    public string Key { get; set; }
+
+    public string Issuer { get; set; }
+
+    public string Audience { get; set; }
+
+    public string Subject { get; set; }
+    public static dynamic ValidarToken(ClaimsIdentity identity)
     {
-        public string Key { get; set; }
+        try
+        {
+            if (identity.Claims.Count()==0)
+            {
+                return new
+                {
+                    success = false,
+                    message = "Token invalido",
+                    result = ""
+                };
+            }
+            var Id = identity.Claims.FirstOrDefault(x => x.Type == "id").Value;
+            var Rol = identity.Claims.FirstOrDefault(x => x.Type == "rol").Value;
 
-        public string Issuer { get; set; }
+            return new { 
+                Id,
+                Rol,
+            };
 
-        public string Audience { get; set; }
+        }
+        catch (Exception ex)
+        {
+            return new
+            {
+                success = false,
+                message = ex.Message,
+                result = ""
+            };
+        }
 
-        public string Subject { get; set; }
-        public Jwt() { }
-    }
+     }
 }

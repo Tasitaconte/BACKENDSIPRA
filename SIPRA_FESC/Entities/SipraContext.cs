@@ -6,10 +6,8 @@ namespace SIPRA_FESC.Entities;
 
 public partial class SipraContext : DbContext
 {
-
     public SipraContext()
     {
-
     }
 
     public SipraContext(DbContextOptions<SipraContext> options)
@@ -35,6 +33,10 @@ public partial class SipraContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySQL("server=localhost;port=3306;user=root;password=;database=sipra");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Carrera>(entity =>
@@ -53,7 +55,7 @@ public partial class SipraContext : DbContext
                 .HasColumnName("carrera");
             entity.Property(e => e.IdCarrera)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_carrera");
         });
 
@@ -118,7 +120,7 @@ public partial class SipraContext : DbContext
 
             entity.ToTable("evaluacion");
 
-            entity.HasIndex(e => e.IdEstudiante, "id_estudiante");
+            entity.HasIndex(e => e.IdEstudiante, "id_estudiante1");
 
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
@@ -153,7 +155,7 @@ public partial class SipraContext : DbContext
                 .HasColumnName("formulario");
             entity.Property(e => e.IdFormulario)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_formulario");
             entity.Property(e => e.Url)
                 .HasMaxLength(300)
@@ -162,30 +164,23 @@ public partial class SipraContext : DbContext
 
         modelBuilder.Entity<FormulariosCargado>(entity =>
         {
-            entity.HasKey(e => new { e.IdUsuario, e.Id }).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("formularios_cargados");
 
-            entity.HasIndex(e => e.IdFormularioCargado, "id_formulario_cargado").IsUnique();
-
-            entity.Property(e => e.IdUsuario)
-                .HasColumnType("int(11)")
-                .HasColumnName("id_usuario");
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
-            entity.Property(e => e.IdFormularioCargado)
-                .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("id_formulario_cargado");
-            entity.Property(e => e.Url)
+            entity.Property(e => e.IdFormulario)
+                .HasMaxLength(255)
+                .HasColumnName("id_formulario");
+            entity.Property(e => e.IdFormularioCargado).HasColumnName("id_formulario_cargado");
+            entity.Property(e => e.IdUsuario)
                 .HasColumnType("int(11)")
+                .HasColumnName("id_usuario");
+            entity.Property(e => e.Url)
+                .HasMaxLength(255)
                 .HasColumnName("url");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.FormulariosCargados)
-                .HasForeignKey(d => d.IdUsuario)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("formularios_cargados_ibfk_1");
         });
 
         modelBuilder.Entity<Rol>(entity =>
@@ -201,7 +196,7 @@ public partial class SipraContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.IdRol)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_rol");
             entity.Property(e => e.Rol1)
                 .HasMaxLength(250)
@@ -214,7 +209,7 @@ public partial class SipraContext : DbContext
 
             entity.ToTable("tipo_convenio");
 
-            entity.HasIndex(e => e.IdTipoConvenio, "id_tipo_convenio").IsUnique();
+            entity.HasIndex(e => e.IdTipoConvenio, "id_tipo_convenio1").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
@@ -224,7 +219,7 @@ public partial class SipraContext : DbContext
                 .HasColumnName("convenio");
             entity.Property(e => e.IdTipoConvenio)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_tipo_convenio");
         });
 
@@ -241,7 +236,7 @@ public partial class SipraContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.IdTipoIdentificacion)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_tipo_identificacion");
             entity.Property(e => e.TipoIdentificacion1)
                 .HasMaxLength(250)
@@ -256,17 +251,14 @@ public partial class SipraContext : DbContext
 
             entity.HasIndex(e => e.Email, "email").IsUnique();
 
-            entity.HasIndex(e => e.IdCarrera, "id_carrera");
+            entity.HasIndex(e => e.IdCarrera, "id_carrera1");
 
-            entity.HasIndex(e => e.IdRol, "id_rol");
+            entity.HasIndex(e => e.IdRol, "id_rol1");
 
             entity.HasIndex(e => e.IdTipoDocumento, "id_tipo_documento");
 
             entity.HasIndex(e => e.IdUsuario, "id_usuario").IsUnique();
 
-            entity.Property(e => e.NumeroIdentificacion)
-                .HasMaxLength(90).HasDefaultValueSql("'NULL'")
-                .HasColumnName("numero_identificacion");
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
@@ -277,21 +269,29 @@ public partial class SipraContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("email");
             entity.Property(e => e.IdCarrera)
+                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
                 .HasColumnName("id_carrera");
             entity.Property(e => e.IdRol)
+                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
                 .HasColumnName("id_rol");
             entity.Property(e => e.IdTipoDocumento)
+                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
                 .HasColumnName("id_tipo_documento");
             entity.Property(e => e.IdUsuario)
                 .HasMaxLength(250)
-                .HasDefaultValueSql("'NULL'")
+                .HasDefaultValueSql("'''NULL'''")
                 .HasColumnName("id_usuario");
             entity.Property(e => e.Nombres)
                 .HasMaxLength(90)
                 .HasColumnName("nombres");
+            entity.Property(e => e.NumeroIdentificacion)
+                .HasMaxLength(90)
+                .HasDefaultValueSql("'''NULL'''")
+                .HasColumnName("numero_identificacion");
+            entity.Property(e => e.Password).HasDefaultValueSql("'NULL'");
 
             entity.HasOne(d => d.IdCarreraNavigation).WithMany(p => p.Usuarios)
                 .HasForeignKey(d => d.IdCarrera)
@@ -308,36 +308,6 @@ public partial class SipraContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("usuario_ibfk_3");
         });
-
-        modelBuilder.Entity<Rol>().HasData(
-           new Rol { Id = 1, IdRol = Guid.NewGuid().ToString() , Rol1 = "Extension" },
-           new Rol { Id = 2, IdRol = Guid.NewGuid().ToString(), Rol1 = "Docente" },
-           new Rol { Id = 3, IdRol = Guid.NewGuid().ToString(), Rol1 = "Estudiante" }
-        );
-
-        modelBuilder.Entity<Carrera>().HasData(
-           new Carrera { Id = 1, IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Ingenieria de Software" },
-           new Carrera { Id = 2, IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Diseño y Administración de Modas" },
-           new Carrera { Id = 3,IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Diseño Grafico" },
-           new Carrera { Id = 4,IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Gestión Logistica Empresarial" },
-           new Carrera { Id = 5,IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Administración Turística y Hotelera" },
-           new Carrera { Id = 6,IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Administración Negocios Internacionales" },
-           new Carrera { Id = 7, IdCarrera = Guid.NewGuid().ToString(), Carrera1 = "Administración financiera" }
-        );
-
-        modelBuilder.Entity<TipoConvenio>().HasData(
-           new TipoConvenio {Id = 1, IdTipoConvenio = Guid.NewGuid().ToString(), Convenio = "CONVENIO" },
-           new TipoConvenio {Id = 2, IdTipoConvenio = Guid.NewGuid().ToString(), Convenio = "TRABAJA CON EMPRESA" },
-           new TipoConvenio {Id = 3, IdTipoConvenio = Guid.NewGuid().ToString(), Convenio = "EMPRESA PROPIA" },
-           new TipoConvenio {Id = 4, IdTipoConvenio = Guid.NewGuid().ToString(), Convenio = "INVESTIGACIÓN" },
-           new TipoConvenio {Id = 5, IdTipoConvenio = Guid.NewGuid().ToString(), Convenio = "APRENDIZ UNIVERSITARIO" }
-
-        );
-        modelBuilder.Entity<TipoIdentificacion>().HasData(
-        new TipoIdentificacion {Id = 1, IdTipoIdentificacion = Guid.NewGuid().ToString(), TipoIdentificacion1 = "C.C" },
-        new TipoIdentificacion {Id = 2, IdTipoIdentificacion = Guid.NewGuid().ToString()  , TipoIdentificacion1 = "T.I" }
-     );
-
 
         OnModelCreatingPartial(modelBuilder);
     }

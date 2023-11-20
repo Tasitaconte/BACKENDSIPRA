@@ -52,11 +52,14 @@ builder.Services.AddScoped<SipraContext>();
 builder.Services.AddScoped<IUsuarioRepository,UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService,UsuarioService>();
 builder.Services.AddScoped<IAuthService,AuthService>();
+builder.Services.AddScoped<IDocumentoRepository,DocumentoRepository>();
+builder.Services.AddScoped<IDocumentoService,DocumentoService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(config =>
 {
-    config.TokenValidationParameters = new() {
+    config.TokenValidationParameters = new TokenValidationParameters
+    {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -69,9 +72,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddCors(options => {
     options.AddPolicy("CorsPolicy", builder => {
-        builder.AllowAnyOrigin();
-        builder.AllowAnyMethod();
-        builder.AllowAnyHeader();
+        builder.WithOrigins("*");
+        builder.WithMethods("*");
+        builder.WithHeaders("*");
     });
 });
 
@@ -81,7 +84,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(config => { config.DefaultModelsExpandDepth(-1); });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

@@ -46,6 +46,13 @@ namespace SIPRA_FESC.Data.Repositories
         {
             return _context.Usuarios.Find(id);
         }
+        
+        public async Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarioByRol(int idRol)
+        {
+            return  await _context.Usuarios.Where(x => x.IdRol == idRol)
+            .ProjectTo<UsuarioDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(); ;
+        }
 
         public Usuario? GetUsuarioByIdUsuario(string idUsuario)
         {

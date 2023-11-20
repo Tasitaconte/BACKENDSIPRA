@@ -36,10 +36,6 @@
   <ItemGroup>
 	<Using Include="BCrypt.Net.BCrypt" Alias="BC" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Models\" />
-  </ItemGroup>
 	
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

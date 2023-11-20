@@ -15,6 +15,7 @@ public interface IUsuarioService
     string ObtenerUsuario(string usuario);
     bool EliminarUsuario(string usuario);
     Task<ActionResult<IEnumerable<UsuarioDto>>> GetAll();
+    Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarioByRol(int idRol);
 
     bool ActualizarUsuario(string usuario);
 }

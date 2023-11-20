@@ -87,6 +87,11 @@ public class UsuarioService : IUsuarioService
         response.SetData(wasCreated);
         return response;
     }
+
+    public Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarioByRol(int idRol)
+    {
+        return _usuarioRepository.GetUsuarioByRol(idRol);
+    }
 }
 
 

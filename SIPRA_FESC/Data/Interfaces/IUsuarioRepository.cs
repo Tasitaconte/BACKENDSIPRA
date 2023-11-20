@@ -13,6 +13,8 @@ namespace SIPRA_FESC.Data.Interfaces
         Usuario? GetUsuarioByNumeroIdentificacion(String numeroIdentificacion);
         Usuario? GetUsuarioByIdUsuario(string idUsuario);
         Usuario? GetUsuarioById(int id);
+        Task<ActionResult<IEnumerable<UsuarioDto>>> GetUsuarioByRol(int idRol);
+
         Task<ActionResult<IEnumerable<UsuarioDto>>> GetAllUsuarios();
     }
 }

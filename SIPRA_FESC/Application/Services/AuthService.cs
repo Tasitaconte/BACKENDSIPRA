@@ -32,8 +32,7 @@ public class AuthService : IAuthService
 
         if (usuario == null)
         {
-            response.SetData(false);
-            return response;
+            throw new Exception("Correo no encontrado");
         };
 
 
@@ -44,7 +43,7 @@ public class AuthService : IAuthService
 
             var nombre = $"{usuario.Nombres} {usuario.Apellidos}";
 
-            var claimns = new[]
+            var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, jwt.Subject),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -60,7 +59,7 @@ public class AuthService : IAuthService
             var token = new JwtSecurityToken(
                 jwt.Issuer,
                 jwt.Audience,
-                claimns,
+                claims,
                 expires: DateTime.Now.AddMinutes(60 * 5),
                 signingCredentials: sigIn
                 );
@@ -71,7 +70,6 @@ public class AuthService : IAuthService
             return response;
         };
 
-        response.SetData(false);
         throw new Exception("Crendenciales Incorrectas");
     }
 }
