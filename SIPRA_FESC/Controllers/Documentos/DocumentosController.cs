@@ -17,15 +17,15 @@ public class DocumentosController : ControllerBase
     private readonly IDocumentoService _documentoService;
     private readonly IDocumentoRepository _documentoRepository;
     private readonly IUsuarioRepository _usuarioRepository;
-    public DocumentosController(IDocumentoService documentoService, IDocumentoRepository documentoRepository, IUsuarioRepository usuarioRepository )
+    public DocumentosController(IDocumentoService documentoService, IDocumentoRepository documentoRepository, IUsuarioRepository usuarioRepository)
     {
-        _documentoService = documentoService;   
+        _documentoService = documentoService;
         _documentoRepository = documentoRepository;
         _usuarioRepository = usuarioRepository;
     }
 
     [HttpPost("/agregar/formulario/pdf")]
-    public IActionResult AgregarFormularioPdf([FromForm] DocumentoRequestModel documentoRequestModel )
+    public IActionResult AgregarFormularioPdf([FromForm] DocumentoRequestModel documentoRequestModel)
     {
         const string savePath = "C:/documentos/formularios/guardados";
         var archivo = documentoRequestModel.Archivo;
@@ -34,15 +34,16 @@ public class DocumentosController : ControllerBase
 
         try
         {
-            if (!utilFunction.EsTipoPDF(archivo)) {
+            if (!utilFunction.EsTipoPDF(archivo))
+            {
                 return BadRequest("Solo se permiten archivos PDF.");
             }
-            
+
             string nombreArchivoUnico = utilFunction.GenerarNombreUnico(nombreFormulario);
-            string rutaArchivoGuardar = utilFunction.ConstruirRutaArchivo(savePath,nombreArchivoUnico);
+            string rutaArchivoGuardar = utilFunction.ConstruirRutaArchivo(savePath, nombreArchivoUnico);
 
             utilFunction.CrearDirectorioSiNoExiste(savePath);
-            utilFunction.GuardarArchivo(archivo,rutaArchivoGuardar);
+            utilFunction.GuardarArchivo(archivo, rutaArchivoGuardar);
 
             Formulario formulario = new()
             {
@@ -57,7 +58,7 @@ public class DocumentosController : ControllerBase
         {
             return StatusCode(500, $"Error interno del servidor: {ex.Message}");
         }
-    }  
+    }
 
     [HttpGet("/descargar/formulario/pdf/{idFormulario}")]
     public IActionResult DescargarFormularioPdf(string idFormulario)
@@ -87,58 +88,65 @@ public class DocumentosController : ControllerBase
         {
             return StatusCode(500, $"Error interno del servidor: {ex.Message}");
         }
-    } 
-    
-    [HttpPost("/subir/estudiante/formulario/pdf")]
+    }
+
     [Authorize]
-    public async Task<IActionResult> SubirFormularioPdfByEstudiante([FromForm] DocumentRequestSubirEstudiante documentRequestSubirEstudiante)
+    [HttpPost("/subir/estudiante/formulario/pdf/{IdFormulario}")]
+    public IActionResult SubirFormularioPdfByEstudiante([FromForm] DocumentRequestSubirEstudiante documentRequestSubirEstudiante,string IdFormulario)
     {
         var identity = HttpContext.User.Identity as ClaimsIdentity;
         var idUsuario = Jwt.ValidarToken(identity);
-        string idFormulario = "27d99821-8f1a-4cc6-a9d1-be85183a4c8d";
 
         var archivo = documentRequestSubirEstudiante.Archivo;
-       
-        var usuarioEntidad =  _usuarioRepository.GetUsuarioByIdUsuario(idUsuario.Id);
-        var formularioEntidad =  _documentoRepository.GetById(idFormulario);
-        var formularioCargadoEntidad = _documentoRepository.GetFormularioCargadoByIdUsuarioAndIdFormulario(idFormulario,usuarioEntidad.Id);
 
-        string savePath = $"C:/documentos/formularios/estudiante/{usuarioEntidad.NumeroIdentificacion}/";
+        var usuarioEntidad = _usuarioRepository.GetUsuarioByIdUsuario(idUsuario.Id);
+
+        if (usuarioEntidad == null)
+        {
+            return BadRequest(new {message = "No existe usuario"});
+        }
+
+        if (usuarioEntidad.Id != 2)
+        {
+            return BadRequest(new {message = "No es estudiante"});
+        }
+
+        var formularioCargadoEntidad = _documentoRepository.GetFormularioCargadoByIdUsuarioAndIdFormulario(IdFormulario, usuarioEntidad.Id);
 
 
-        string nombreFormulario = $"{formularioEntidad.Formulario1}_{usuarioEntidad.NumeroIdentificacion}";
+        if (formularioCargadoEntidad != null)
+        {
+            return Ok(new { message = "Usted ya subió este formulario" });
+        }
 
 
-        return Ok(formularioCargadoEntidad);
+        string identificador = $"{usuarioEntidad.NumeroIdentificacion}_{usuarioEntidad.Nombres}{usuarioEntidad.Apellidos}";
+        string savePath = $"C:/documentos/formularios/estudiante/{identificador}/";
+
+        var formularioEntidad = _documentoRepository.GetById(IdFormulario);
+        string nombreFormulario = $"{formularioEntidad.Formulario1}_{identificador}";
 
         UtilFunction utilFunction = new();
-        try
+
+        if (!utilFunction.EsTipoPDF(archivo))
         {
-            if (!utilFunction.EsTipoPDF(archivo))
-            {
-                return BadRequest("Solo se permiten archivos PDF.");
-            }
-
-            string nombreArchivoUnico = utilFunction.GenerarNombreUnico(nombreFormulario);
-            string rutaArchivoGuardar = utilFunction.ConstruirRutaArchivo(savePath, nombreArchivoUnico);
-            
-            
-            utilFunction.CrearDirectorioSiNoExiste(savePath);
-            utilFunction.GuardarArchivo(archivo, rutaArchivoGuardar);
-
-            FormulariosCargado formularioCargado = new()
-            {
-                Url = rutaArchivoGuardar,
-                IdUsuario = usuarioEntidad.Id,
-            };
-
-            var result = _documentoService.SubirFormularioEstudiante(formularioCargado);
-            return Ok(new { message = result, RutaArchivo = rutaArchivoGuardar });
+            return BadRequest("Solo se permiten archivos PDF.");
         }
-        catch (Exception ex)
+
+        string nombreArchivoUnico = utilFunction.GenerarNombreUnico(nombreFormulario);
+        string rutaArchivoGuardar = utilFunction.ConstruirRutaArchivo(savePath, nombreArchivoUnico);
+
+        utilFunction.CrearDirectorioSiNoExiste(savePath);
+        utilFunction.GuardarArchivo(archivo, rutaArchivoGuardar);
+
+        FormulariosCargado formularioCargado = new()
         {
-            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
-        }
-      
+            Url = rutaArchivoGuardar,
+            IdUsuario = usuarioEntidad.Id,
+            IdFormulario = IdFormulario,
+        };
+
+        var result = _documentoService.SubirFormularioEstudiante(formularioCargado);
+        return Ok(new { message = result, RutaArchivo = rutaArchivoGuardar });
     }
 }

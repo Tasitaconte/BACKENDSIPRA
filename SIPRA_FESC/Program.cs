@@ -41,11 +41,6 @@ builder.Services.AddSwaggerGen(config => {
     });
 });
 
-builder.Services.AddDbContext<SipraContext>(optionsAction: options => {
-#pragma warning disable CS8604 // Posible argumento de referencia nulo
-  _ = options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
-#pragma warning restore CS8604 // Posible argumento de referencia nulo
-});
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<SipraContext>();
