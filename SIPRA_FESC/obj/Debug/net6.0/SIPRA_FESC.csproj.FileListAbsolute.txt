@@ -269,3 +269,4 @@ C:\Users\thoma\source\repos\SIPRA_FESC\SIPRA_FESC\obj\Debug\net6.0\SIPRA_FESC.xm
 C:\Users\thoma\source\repos\SIPRA_FESC\SIPRA_FESC\obj\Debug\net6.0\SIPRA_FESC.pdb
 C:\Users\thoma\source\repos\SIPRA_FESC\SIPRA_FESC\obj\Debug\net6.0\SIPRA_FESC.genruntimeconfig.cache
 C:\Users\thoma\source\repos\SIPRA_FESC\SIPRA_FESC\obj\Debug\net6.0\ref\SIPRA_FESC.dll
+C:\Users\thoma\source\repos\SIPRA_FESC\SIPRA_FESC\obj\Debug\net6.0\SIPRA_FESC.sourcelink.json

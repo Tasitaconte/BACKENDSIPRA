@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SIPRA_FESC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+735e1722712fe7e9f46c151a21fe3d7821fbad8b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SIPRA_FESC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SIPRA_FESC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

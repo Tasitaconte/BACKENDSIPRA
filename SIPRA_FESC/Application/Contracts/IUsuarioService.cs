@@ -11,7 +11,6 @@ public interface IUsuarioService
     ResponseModel<bool> CrearExtension(UsuarioRequestCrearModel usuario);
     ResponseModel<bool> CrearDocente(UsuarioRequestCrearModel usuario);
     ResponseModel<bool> CrearEstudiante(UsuarioRequestCrearModel usuario);
-
     string ObtenerUsuario(string usuario);
     bool EliminarUsuario(string usuario);
     Task<ActionResult<IEnumerable<UsuarioDto>>> GetAll();

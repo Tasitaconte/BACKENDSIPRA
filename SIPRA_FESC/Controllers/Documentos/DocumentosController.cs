@@ -41,17 +41,20 @@ public class DocumentosController : ControllerBase
 
             string nombreArchivoUnico = utilFunction.GenerarNombreUnico(nombreFormulario);
             string rutaArchivoGuardar = utilFunction.ConstruirRutaArchivo(savePath, nombreArchivoUnico);
-
-            utilFunction.CrearDirectorioSiNoExiste(savePath);
-            utilFunction.GuardarArchivo(archivo, rutaArchivoGuardar);
-
+           
             Formulario formulario = new()
             {
                 Formulario1 = nombreFormulario,
                 Url = rutaArchivoGuardar
             };
-
+               
             var result = _documentoService.AgregarFormulario(formulario);
+
+            if (result){
+                utilFunction.CrearDirectorioSiNoExiste(savePath);
+                utilFunction.GuardarArchivo(archivo, rutaArchivoGuardar);
+            }
+
             return Ok(new { message = result, RutaArchivo = rutaArchivoGuardar });
         }
         catch (Exception ex)
@@ -60,34 +63,74 @@ public class DocumentosController : ControllerBase
         }
     }
 
-    [HttpGet("/descargar/formulario/pdf/{idFormulario}")]
-    public IActionResult DescargarFormularioPdf(string idFormulario)
+    [HttpGet("/formulario/all")]
+    public IActionResult GetFormulariosAll()
     {
-        try
+        UtilFunction utilFunction = new UtilFunction(); 
+        var formulario =  _documentoRepository.GetFormulariosAll();
+
+        var formularioDto = formulario.Select(formulario => new
         {
+            formulario.Id,
+            formulario.IdFormulario,
+            formulario.Formulario1,
+            PdfContent = Convert.ToBase64String(System.IO.File.ReadAllBytes(formulario.Url)),
+        });
 
-            var formulario = _documentoRepository.GetById(idFormulario);
+        return Ok(formularioDto);
+    }
 
-            if (formulario == null || formulario.Formulario1 == null)
-            {
-                return NotFound("El archivo no existe.");
-            }
+    [HttpGet("/formulario/all/estudiante")]
+    public IActionResult GetFormulariosAllEstudiante()
+    {
+        UtilFunction utilFunction = new UtilFunction();
 
-            string rutaArchivo = formulario.Url;
-            if (!System.IO.File.Exists(rutaArchivo))
-            {
-                return NotFound("El archivo no existe.");
-            }
+        var identity = HttpContext.User.Identity as ClaimsIdentity;
+        var idUsuario = Jwt.ValidarToken(identity);
+        
+        var result = _documentoService.obtenerFormularioCargado(idUsuario.Id);
+
+        var formulario = _documentoRepository.GetFormulariosAll();
+        var usuarioEntidad = _usuarioRepository.GetUsuarioByIdUsuario(idUsuario.Id);
 
 
-            byte[] archivoBytes = System.IO.File.ReadAllBytes(rutaArchivo);
-
-            return File(archivoBytes, "application/pdf", formulario.Formulario1);
-        }
-        catch (Exception ex)
+        if (usuarioEntidad == null)
         {
-            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            throw new Exception("Usuario no existe");
         }
+
+        if (usuarioEntidad.IdRol != 3)
+        {
+            throw new Exception("No es estudiante");
+        }
+
+        var formularioCargado = _documentoRepository.GetFormularioCargadoByIdUsuario(usuarioEntidad.Id);
+
+        if (formularioCargado == null)
+        {
+            var formularioDto = formulario.Select(formulario => new
+            {
+                formulario.Id,
+                formulario.IdFormulario,
+                formulario.Formulario1,
+                cargado = false,
+                PdfContent = Convert.ToBase64String(System.IO.File.ReadAllBytes(formulario.Url)),
+            });
+
+
+        }
+
+        return Ok(formularioCargado);
+
+        /*
+        ;*/
+    }
+
+    [HttpDelete("/eliminar/formulario/pdf/{idFormulario}")]
+    public IActionResult EliminarFormularioPdf(string idFormulario)
+    {
+       bool result= _documentoRepository.Delete(idFormulario);
+        return Ok(result);
     }
 
     [Authorize]

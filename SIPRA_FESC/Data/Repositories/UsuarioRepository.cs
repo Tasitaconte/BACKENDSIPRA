@@ -56,7 +56,7 @@ namespace SIPRA_FESC.Data.Repositories
 
         public Usuario? GetUsuarioByIdUsuario(string idUsuario)
         {
-            return _context.Usuarios.FirstOrDefault(x=> x.IdUsuario == idUsuario);
+            return _context.Usuarios.Where(x=> x.IdUsuario == idUsuario).First();
         }
 
         public Usuario? GetUsuarioByNumeroIdentificacion(string numeroIdentificacion)

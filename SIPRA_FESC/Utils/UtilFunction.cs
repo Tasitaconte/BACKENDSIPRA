@@ -15,6 +15,13 @@ namespace SIPRA_FESC.Utils
             return $"{DateTime.Now:yyyyMMddHHmmssfff}_{nombre}.pdf";
         }
 
+        public byte[] GenerarPdfBlod(string rutaArchivo)
+        {
+            byte[] archivoBytes = System.IO.File.ReadAllBytes(rutaArchivo);
+
+            return archivoBytes;
+        }
+
         public string ConstruirRutaArchivo(string rutaDirectorio, string nombreArchivo)
         {
             return Path.Combine(rutaDirectorio, nombreArchivo);

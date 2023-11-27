@@ -30,6 +30,10 @@ namespace SIPRA_FESC.Utils
             CreateMap<FormulariosCargado, FormularioCargadoDto>();
 
             CreateMap<FormularioCargadoDto, FormulariosCargado>();
+
+            CreateMap<FormularioDto, Formulario>();
+            
+            CreateMap<Formulario, FormularioDto>();
         }
     }
 }
